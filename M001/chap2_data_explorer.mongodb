@@ -1,0 +1,19 @@
+
+// Show list of data bases
+show dbs
+
+// use a one database
+use('sample_training');
+
+// show collections in the database
+show collections
+
+// find all zip codes for NY state
+use('sample_training');
+db.zips.find({"state":"NY"}).count();
+
+// find zips codes for NY state in Albany
+db.zips.find({"state":"NY", "city":"ALBANY"});
+
+// if not pretty by default
+db.zips.find({"state":"NY", "city":"ALBANY"}).pretty()
