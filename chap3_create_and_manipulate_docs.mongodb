@@ -1,0 +1,46 @@
+use('sample_training');
+
+// find one item from a collection (gives an example of document as sample: copy/paste and tweak)
+db.inspections.findOne();
+
+// Insert a new document in the collection (will not work as same _id)
+db.inspections.insert({
+  "_id": {
+    "$oid": "56d61033a378eccde8a8354f"
+  },
+  "id": "10021-2015-ENFO",
+  "certificate_number": 9278806,
+  "business_name": "ATLIXCO DELI GROCERY INC.",
+  "date": "Feb 20 2015",
+  "result": "No Violation Issued",
+  "sector": "Cigarette Retail Dealer - 127",
+  "address": {
+    "city": "RIDGEWOOD",
+    "zip": 11385,
+    "street": "MENAHAN ST",
+    "number": 1712
+  }
+})
+
+// Insert a new document in the collection 
+// without _id defined, a new id is automatically added (then 2 instances of the same doc)
+use('sample_training');
+db.inspections.insert({
+
+  "id": "10021-2015-ENFO",
+  "certificate_number": 9278806,
+  "business_name": "ATLIXCO DELI GROCERY INC.",
+  "date": "Feb 20 2015",
+  "result": "No Violation Issued",
+  "sector": "Cigarette Retail Dealer - 127",
+  "address": {
+    "city": "RIDGEWOOD",
+    "zip": 11385,
+    "street": "MENAHAN ST",
+    "number": 1712
+  }
+});
+
+// shoould find 2 docs now
+use('sample_training');
+db.inspections.find({"id" : "10021-2015-ENFO", "certificate_number" : 9278806});
