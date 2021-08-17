@@ -9,12 +9,17 @@ MongoDb training
 
 - [M320 Data Modeling](https://university.mongodb.com/courses/M320/about)
 
+- [x] [Certificate](https://university.mongodb.com/course_completion/49ab2d17-c8c3-46bb-917f-62094cf1aa12?utm_source=copy&utm_medium=social&utm_campaign=university_social_sharing)
+
+- [M220 MongoDB for Python Developers](https://university.mongodb.com/courses/M220P/about)
+
+- [ ] working on it...
 
 # Lectures
 
-MongoDB Developer Hub
-MongoDB Community Forums
-Case study: Bosch Leads Charge into Internet of Things
-Case study: Forbes
-Case study: SEGA
-How the Financial Sector Uses MongoDB
+MongoDB Developer Hub  
+MongoDB Community Forums  
+Case study: Bosch Leads Charge into Internet of Things  
+Case study: Forbes  
+Case study: SEGA  
+How the Financial Sector Uses MongoDB  
