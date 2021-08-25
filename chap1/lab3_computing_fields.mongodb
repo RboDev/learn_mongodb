@@ -1,0 +1,47 @@
+use("aggregations")
+
+// count films with one word title
+
+var pipeline = [
+    {
+    $project: {
+      title:1, word_count:{$size:{$split:[title," "]}}
+    }}
+]
+
+cursor = db.movies.aggregate(pipeline) //.itcount()
+
+db.movies.findOne()
+
+db.movies.aggregate([
+    {
+    $project: {
+      title:1, "word_count":{$size:{$split:["$title"," "]}}
+    }},
+    {$match: {word_count:1}}
+]).itcount()
+
+// Solution lqb
+db.movies.aggregate([
+  {
+    // Ensure the title is a string
+    $match: {
+      title: {
+        $type: "string"
+      }
+    }
+  },
+  {
+    // Split the title string by spaces
+    $project: {
+      title: { $split: ["$title", " "] },
+      _id: 0
+    }
+  },
+  {
+    // Filter only 1 word
+    $match: {
+      title: { $size: 1 }
+    }
+  }
+]).itcount()
