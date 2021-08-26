@@ -1,0 +1,77 @@
+use("aggregations")
+
+db.movies.find().skip(1000).limit(1)
+
+favorites = [
+  "Sandra Bullock",
+  "Tom Hanks",
+  "Julia Roberts",
+  "Kevin Spacey",
+  "George Clooney"]
+
+db.movies.aggregate([
+    {$match:{
+        countries: "USA",
+        "tomatoes.viewer.rating":{$gte:3},
+        cast: {$elemMatch:{$exists:true}},
+    }},
+    {$project:{
+        _id:0,
+        num_favs:{$size:{$setIntersection:["$cast",favorites]}},
+        rating:"$tomatoes.viewer.rating",
+        title:1,
+    }},
+    {$sort:{num_favs:-1, rating:-1, title:-1}},
+    {$skip:24},
+    {$limit:1}
+])
+
+
+// Solution
+
+var favorites = [
+  "Sandra Bullock",
+  "Tom Hanks",
+  "Julia Roberts",
+  "Kevin Spacey",
+  "George Clooney"]
+
+db.movies.aggregate([
+  {
+    // We start by matching films that include at least one of our favorites in their cast
+    $match: {
+      "tomatoes.viewer.rating": { $gte: 3 },
+      countries: "USA",
+      cast: {
+        $in: favorites
+      }
+    }
+  },
+  {
+    // Then, we will be projecting the num_favs value by calculating the $size of the array intersection, 
+    // between the given set of favorites and the film cast:
+    $project: {
+      _id: 0,
+      title: 1,
+      "tomatoes.viewer.rating": 1,
+      num_favs: {
+        $size: {
+          $setIntersection: [
+            "$cast",
+            favorites
+          ]
+        }
+      }
+    }
+  },
+  // After that, we call the $sort stage and $skip + $limit in the result to the element requested:
+  {
+    $sort: { num_favs: -1, "tomatoes.viewer.rating": -1, title: -1 }
+  },
+  {
+    $skip: 24
+  },
+  {
+    $limit: 1
+  }
+])
