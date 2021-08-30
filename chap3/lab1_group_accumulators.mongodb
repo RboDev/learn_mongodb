@@ -1,0 +1,40 @@
+db
+
+db.movies.find().skip(100).limit(1)
+
+db.movies.findOne({title:"Bird"})
+
+db.movies.aggregate([
+    {$match:{awards:{$regex: "Oscar"}}},
+    {$project:{_id:0, title:1, awards:1}}
+])
+
+
+db.movies.aggregate([
+    {$match:{awards:{$regex: /Won \d+ Oscar/}}},
+    {$group:{
+        _id: null,
+        highest_rating:{$max:"$imdb.rating"},
+        lowest_rating:{$min:"$imdb.rating"},
+        average_rating:{$avg:"$imdb.rating"},
+        deviation_rating:{$stdDevSamp:"$imdb.rating"},
+    }}
+])
+
+// Solution
+db.movies.aggregate([
+  {
+    $match: {
+      awards: /Won \d{1,2} Oscars?/
+    }
+  },
+  {
+    $group: {
+      _id: null,
+      highest_rating: { $max: "$imdb.rating" },
+      lowest_rating: { $min: "$imdb.rating" },
+      average_rating: { $avg: "$imdb.rating" },
+      deviation: { $stdDevSamp: "$imdb.rating" }
+    }
+  }
+])

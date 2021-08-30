@@ -1,0 +1,60 @@
+
+db.movies.aggregate([
+    {$match:{
+        languages:"English"
+    }},
+    {$project:{
+        _id:0,
+        cast:1,
+        rating:"$imdb.rating"
+    }},
+    {$unwind:"$cast"},
+    {$group:{
+        _id:"$cast",
+        numFilms:{$sum:1},
+        average:{$avg:"$rating"}, // round does not work here 
+    }},
+    {$project:{
+        numFilms:1,
+        average:{$round:["$average",1]}
+    }},
+    {$sort:{numFilms:-1}},
+    {$limit:1}
+])
+
+// Solution
+
+db.movies.aggregate([
+  {
+    $match: {
+      languages: "English"
+    }
+  },
+  {
+    $project: { _id: 0, cast: 1, "imdb.rating": 1 }
+  },
+  {
+    $unwind: "$cast"
+  },
+  {
+    $group: {
+      _id: "$cast",
+      numFilms: { $sum: 1 },
+      average: { $avg: "$imdb.rating" }
+    }
+  },
+  {
+    $project: {
+      numFilms: 1,
+      average: {
+        $divide: [{ $trunc: { $multiply: ["$average", 10] } }, 10]
+      }
+    }
+  },
+  {
+    $sort: { numFilms: -1 }
+  },
+  {
+    $limit: 1
+  }
+])
