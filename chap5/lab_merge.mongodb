@@ -1,0 +1,10 @@
+// no lab just question 
+
+{
+  $merge: {
+      into: "analytics",
+      on: "name",
+      whenMatched: "merge",
+      whenNotMatched: "insert"
+  }
+}

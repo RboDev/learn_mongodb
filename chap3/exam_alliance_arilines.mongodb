@@ -1,0 +1,62 @@
+
+db.air_routes.aggregate([
+    {$match:{
+        $or:[
+            {src_airport:"JFK",dst_airport:"LHR"},
+            {src_airport:"LHR",dst_airport:"JFK"}
+        ]
+    }},
+    {$group:{
+        _id:"$airline.name"
+    }},
+    {$lookup: {
+      from: 'air_alliances',
+      localField: '_id',
+      foreignField: 'airlines',
+      as: 'alliance'
+    }},
+    {$unwind: "$alliance"},
+    {$project: {
+        _id:1, 
+        alliance:"$alliance.name"}
+    },
+    {$group:{
+        _id:"$alliance",
+        count:{$sum:1}
+    }}
+])
+
+// Solution
+db.air_routes.aggregate([
+  {
+    $match: {
+      src_airport: { $in: ["LHR", "JFK"] },
+      dst_airport: { $in: ["LHR", "JFK"] }
+    }
+  },
+  {
+    $lookup: {
+      from: "air_alliances",
+      foreignField: "airlines",
+      localField: "airline.name",
+      as: "alliance"
+    }
+  },
+  {
+    $match: { alliance: { $ne: [] } }
+  },
+  {
+    $addFields: {
+      alliance: { $arrayElemAt: ["$alliance.name", 0] }
+    }
+  },
+  {
+    $group: {
+      _id: "$airline.id",
+      alliance: { $first: "$alliance" }
+    }
+  },
+  {
+    $sortByCount: "$alliance"
+  }
+])
