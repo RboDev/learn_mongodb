@@ -1,0 +1,33 @@
+
+db
+
+// Show list of data bases
+show dbs
+
+use("tmp")
+
+db.collection.find()
+
+use("tmp")
+db.collection.insertOne({"a":[1,2,3]})
+db.collection.insertOne({"a":[1,34,13]})
+
+use("tmp")
+use("tmp")
+db.collection.aggregate([
+  //{"$match": { "a" : {"$sum": 1}  }},
+  //{"$project": { "_id" : {"$addToSet": "$a"}  }},
+  {"$group": { "_id" : "", "max_a": {"$max": "$_id"}  }}
+])
+
+
+use("tmp")
+db.collection.aggregate([
+    {"$project": { "a_divided" : {"$divide": ["$a", 1]}  }}
+])
+
+use("tmp")
+db.collection.aggregate([
+    {"$project": {"a": {"$max": "$a"}}},
+    {"$group": {"_id": "$$ROOT._id", "all_as": {"$sum": "$a"}}}
+])
