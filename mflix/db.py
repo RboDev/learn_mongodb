@@ -267,14 +267,81 @@ def get_movie(id):
 
         # TODO: Get Comments
         # Implement the required pipeline.
+        # pipeline = [{
+        #     "$match": {
+        #         "_id": ObjectId(id)
+        #     }},{
+        #     "$lookup": {
+        #         "from": "comments",
+        #         "let":{"id":"$_id"},
+        #         "pipeline":[{
+        #             "$match":{"$expr":{"$eq":["$movie_id","$$id"]}},
+        #             "$sort":{"$date":DESCENDING}
+        #         }],
+        #         "as": "comments"
+        #     }}
+        # ]
+
+        # From Compass 
+        # pipeline = [
+        #     {
+        #         '$match': {
+        #             '_id': ObjectId(id)
+        #         }
+        #     },  {
+        #         '$lookup': {
+        #             'from': 'comments', 
+        #             'let': {
+        #                 'id': '$_id'
+        #             }, 
+        #             'pipeline': [
+        #                 {
+        #                     '$match': {
+        #                         '$expr': {
+        #                             '$eq': [
+        #                                 '$movie_id', '$$id'
+        #                             ]
+        #                         }
+        #                     }
+        #                 }, {
+        #                     '$sort': {
+        #                         'date': -1
+        #                     }
+        #                 }
+        #             ], 
+        #             'as': 'comments'
+        #         }
+        #     }
+        # ]
+
+        # solution
         pipeline = [
             {
+                # find the current movie in the "movies" collection
                 "$match": {
                     "_id": ObjectId(id)
                 }
+            },
+            {
+                "$lookup": {
+                    "from": "comments",
+                    "let": { "id": "$_id" },
+                    "pipeline": [
+                        # only join comments with matching movie_id
+                        {
+                            "$match": {
+                                "$expr": {"$eq": ["$movie_id", "$$id"]}}
+                        },
+                        # sort comments in descending order by date
+                        {
+                            "$sort": {"date": -1}
+                        }
+                    ],
+                    # call embedded field comments
+                    "as": "comments"
+                }
             }
         ]
-
         movie = db.movies.aggregate(pipeline).next()
         return movie
 
@@ -333,7 +400,14 @@ def add_comment(movie_id, user, comment, date):
     """
     # TODO: Create/Update Comments
     # Construct the comment document to be inserted into MongoDB.
-    comment_doc = { "some_field": "some_value" }
+    comment_doc = { 
+        "email": user.email,
+        "name": user.name,
+        "movie_id": ObjectId(movie_id),
+        "text": comment, 
+        "date": date,
+        }
+
     return db.comments.insert_one(comment_doc)
 
 
@@ -347,8 +421,8 @@ def update_comment(comment_id, user_email, text, date):
     # Use the user_email and comment_id to select the proper comment, then
     # update the "text" and "date" of the selected comment.
     response = db.comments.update_one(
-        { "some_field": "some_value" },
-        { "$set": { "some_other_field": "some_other_value" } }
+        { "email": user_email, "_id": ObjectId(comment_id) },
+        { "$set": { "text": text, "date":date } }
     )
 
     return response
@@ -369,7 +443,7 @@ def delete_comment(comment_id, user_email):
 
     # TODO: Delete Comments
     # Use the user_email and comment_id to delete the proper comment.
-    response = db.comments.delete_one( { "_id": ObjectId(comment_id) } )
+    response = db.comments.delete_one( { "_id": ObjectId(comment_id) , "email":user_email} )
     return response
 
 
@@ -422,8 +496,7 @@ def add_user(name, email, hashedpw):
             "email": email,
             "password": hashedpw
         }
-
-        result = db.users.insert_one(user, w='majority')
+        result = db.users.with_options(write_concern=WriteConcern(w='majority')).insert_one(user) 
         print(result)
         
         return {"success": True}
@@ -518,8 +591,8 @@ def update_prefs(email, prefs):
         # TODO: User preferences
         # Use the data in "prefs" to update the user's preferences.
         response = db.users.update_one(
-            { "some_field": "some_value" },
-            { "$set": { "some_other_field": "some_other_value" } }
+            { "email": email },
+            { "$set": { "preferences": prefs } }
         )
         if response.matched_count == 0:
             return {'error': 'no user found'}
