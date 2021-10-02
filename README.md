@@ -31,10 +31,9 @@ MongoDb training
 [$merge (aggregation) ]("https://docs.mongodb.com/manual/reference/operator/aggregation/merge/)  
 [Query Plans ]("https://docs.mongodb.com/manual/core/query-plans/)  
 
+### [M220 MongoDB for Python Developers](https://university.mongodb.com/courses/M220P/about)
 
-- [M220 MongoDB for Python Developers](https://university.mongodb.com/courses/M220P/about)
-
-- [ ] working on it...
+- [ x] [Certificate](https://university.mongodb.com/course_completion/6cc5cdd8-d03b-482b-a434-84058935db23?utm_source=copy&utm_medium=social&utm_campaign=university_social_sharing)
 
 # Lectures
 
